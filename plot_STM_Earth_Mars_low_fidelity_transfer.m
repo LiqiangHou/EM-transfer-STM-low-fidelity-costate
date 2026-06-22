@@ -95,15 +95,18 @@ for k = 1:size(t, 1)
     t_swicth_alpha(k,:)  = [t(k),u,-alpha'];
 end
 
-plot(t_days,t_swicth_alpha(:,2), 'k',...
-     t_days,t_swicth_alpha(:,3), 'k-.',...
-     t_days,t_swicth_alpha(:,4), 'k:',...
-     t_days,t_swicth_alpha(:,5), 'k--'...
-     );
+hold on;
+plot(t_days,t_swicth_alpha(:,2), 'k-','LineWidth', 2.5);
+plot(t_days,t_swicth_alpha(:,3), 'k-.','LineWidth',2.5 );
+plot(t_days,t_swicth_alpha(:,4), 'k:','LineWidth', 2.5 );
+plot(t_days,t_swicth_alpha(:,5), 'k--','LineWidth',2.5 );
 xlabel('Time of Flight (days)');
 ylabel('Thrust Profile');
 
-legend('Switch function', 'Thrust Direction - 1','Thrust Direction - 2','Thrust Direction - 3');
+axis tight;
+xlim([min(t_days) max(t_days)]);
+ylim padded;
+legend('Switch function', 'Thrust Direction - x','Thrust Direction - y','Thrust Direction - z');
 
 % Detect changes
 [pts_switch, ~] = findchangepts(t_swicth_alpha(:,2), 'MaxNumChanges', 1);
