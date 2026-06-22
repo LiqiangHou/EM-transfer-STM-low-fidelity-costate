@@ -1,57 +1,9 @@
-function main_STM_Earth_Mars_low_fidelity_transfer
+function plot_STM_Earth_Mars_low_fidelity_transfer
 clear all;
+close all;
+
 
 format short g;
-% 
-
-%
-% ------------
-% lb = [-1.0*ones(1,6) 0.0];
-% ub = [ 1.0*ones(1,6) 1.0];
-% lambda_0 = 0.1 *ones(1,7);
-% nonlcon = [];
-% ------------
-% low fidelity
-
-% feq_data =  -5.7719e-07   2.8104e-06  -3.0679e-07   8.5199e-07  -3.1958e-06  -1.4299e-07   5.3608e-08       474.43       1341.9   4.3918e-06
-% x =     -0.18122     -0.74713      0.44599     -0.60143      0.36878      0.17906    0.0019165     0.038467     0.049746    0.0027327
-% fval =   4.3918e-06
-%    73        1249    4.391786e-06     0.000e+00     2.929e-11     1.144e-15     5.472e-01  
-
-% ode113 may lead some difference. unrecommended
-   %---------------------------------------------
-% high-fidelity solution
-
-% feq_data =    7.4847e-06  -4.1743e-06  -7.2155e-06  -1.5277e-05  -6.0892e-06  -4.6833e-06   1.7962e-05       474.43       1350.9   2.7213e-05
-% 
-% x =   -0.28526     -0.66883      0.18613     -0.55339      0.45125      0.17403     0.010007     0.029477     0.030577   -0.0012208
-% fval =
-%    2.7213e-05
-%    75        1306    2.721268e-05     0.000e+00     1.636e-14     1.431e-15     2.549e+00  
-
-
-
-%---------------------------------------------------
-% low fiedlity  
-% % % eq.2.61, the switching function
-% [u,alpha]     = Hamiltonian_switch(x,lambda_0,const);
-% u = 1;
-% lb = [-1.0*ones(1,7) ];
-% ub = [ 1.0*ones(1,7) ];
-% lambda_0 = 0.2 *ones(1,7);
-%
-% feq_data =
-%   -4.2332e-07   2.1726e-06    4.824e-07   6.7471e-07  -3.8057e-06  -1.0518e-06   4.8284e-07       474.43       1342.5   4.6271e-06
-% 
-%   107        1617    4.626973e-06     0.000e+00     4.184e-11     1.513e-15     1.841e+00  
-% x =
-%      -0.14019     -0.75479     -0.01694     -0.48182      0.47409      0.17477    0.0058159     0.037689     0.048614    0.0055288
-% 
-% fval =
-% 
-%     4.627e-06
-
-
 
 
 % initial trial of lambda 
@@ -59,11 +11,16 @@ format short g;
 
 global epsl
 global epsl_t
-
+global u_flag
 % the optimal
 
 addpath('asteroid propagation');
 addpath('convolution-branch-nov-27');
+addpath('high fidelity heliocentric');
+
+
+
+
 
 
 TOF_days =  474.43;
@@ -79,99 +36,162 @@ epsl_t = 1.0e-5;
 
 
 
+u_flag = 1;
+T = 0.33;
+xzero =    [       -0.14019     -0.75479     -0.01694     -0.48182      0.47409      0.17477    0.0058159     0.037689     0.048614    0.0055288];
+%------------------------
 
-%
-fmincon_conv_pde_low_thrust(const);
+% construct the transfer
+[feq,t,y,const] = transport_pde_low_thrust(xzero,const);
 
-return
-end
 
 
 % 
-function fmincon_conv_pde_low_thrust(const)
+plot_trajetcory(t,y,const);
+
+return
+end
+
+%% ---
+function plot_trajetcory(t,y,const)
+t_days = t*const.t_ref/86400;
+
+% trajectory of mars and earth
+for k = 1:size(t, 1)
+    mjd     = const.mjd2000 + t_days(k);
+
+
+    [r_mars,  v_mars,  E_mars]   = pleph_an (mjd, 4);
+    [r_earth, v_earth, E_earth]  = pleph_an (mjd, 3);
+
+
+    array_r_mars(k , :)  = r_mars/const.l_ref;
+    array_r_earth(k , :) = r_earth/const.l_ref;
+    
+end
+
+% % font and style setting
+set(groot, 'defaultTextFontName', 'Times New Roman');
+set(groot, 'DefaultAxesFontName', 'Times New Roman');
+set(groot, 'DefaultAxesFontSize', 14);
+set(groot, 'DefaultLineLineWidth', 1);
+set(gca, 'FontSize', 14);
+
+% start and final position
+pos_earth = const.r0_earth;
+pos_mars  = const.rf_mars;
 
 
 
-% % Available algorithms: 'interior-point', 'sqp', 'sqp-legacy', 'active-set', and 'trust-region-reflective'.
-options = optimoptions('fmincon','Display','iter','Algorithm','sqp','TolFun',1.0e-12,'TolX',1.0e-12,'StepTolerance',1.0e-15,'PlotFcns',@optimplotfval,'MaxFunctionEvaluations',2000);
-% options = optimoptions('fmincon','Display','iter','Algorithm','interior-point','TolFun',1.0e-12,'TolX',1.0e-12,'StepTolerance',1.0e-15,'PlotFcns',@optimplotfval,'MaxFunctionEvaluations',2000);
+% --- switch & thrust---
 
-% 
-A = [];
-b = [];
-Aeq = [];
-beq = [];
-%---------------
-lb = [-1.0*ones(1,7) ];
-ub = [ 1.0*ones(1,7) ];
+h_thrust = figure(1);
 
-% ------------
+% switch and thrust profile
 
-% initial trial of lambda 
+for k = 1:size(t, 1)
+    [dot_y,u,alpha]      = ode_transport_dyn(t(k),y(k,:)',const);
 
-lambda_0 = 0.1 *ones(1,7);
-nonlcon = [];
+    t_swicth_alpha(k,:)  = [t(k),u,-alpha'];
+end
 
-x0      = [lambda_0];
+plot(t_days,t_swicth_alpha(:,2), 'k',...
+     t_days,t_swicth_alpha(:,3), 'k-.',...
+     t_days,t_swicth_alpha(:,4), 'k:',...
+     t_days,t_swicth_alpha(:,5), 'k--'...
+     );
+xlabel('Time of Flight (days)');
+ylabel('Thrust Profile');
 
-% paramteres of the initial velocity
+legend('Switch function', 'Thrust Direction - 1','Thrust Direction - 2','Thrust Direction - 3');
 
+% Detect changes
+[pts_switch, ~] = findchangepts(t_swicth_alpha(:,2), 'MaxNumChanges', 1);
+savefig(h_thrust, 'low_fidelity_earth_mars_thrust.fig');
 
-vin_alpha_delta_0  =  [ 0.0,  0.0,         0.0  ];
-vin_alpha_delta_lb =  [-0.05,  deg2rad(-18), deg2rad(-5)];
-vin_alpha_delta_ub =  [ 0.05,  deg2rad( 18), deg2rad( 5)];
+% --- transfer ----
+h_trajector = figure(2);
 
-
-
-% -----
-
-%
+hold on; 
 
 
-x0 = [x0,vin_alpha_delta_0];
-lb = [lb,vin_alpha_delta_lb];
-ub = [ub,vin_alpha_delta_ub];
+
+% Earth: 
+% Plot a red circle marker at the end point
+plot(pos_earth(1), pos_earth(2), 'ko', ...
+    'MarkerSize', 10, ...
+    'MarkerFaceColor', 'k'); % 'ro' for red circle
+
+label_text = 'Earth';
+% Adjust the position for better readability, e.g., slightly above/right
+text(pos_earth(1)+0.02, pos_earth(2)+0.02,label_text, ...
+    'VerticalAlignment', 'bottom', ... % Align text below the point
+    'HorizontalAlignment', 'left', ...  % Align text to the left of the point
+    'Color', 'k', ... % 'k' for black text
+    'FontSize', 14); 
+
+% Mars: 
+% Plot a red circle marker at the end point
+plot(pos_mars(1), pos_mars(2), 'kp', ...
+    'MarkerSize', 10, ...
+    'MarkerFaceColor', 'k'); % 'bp' for red circle
+
+label_text = 'Mars';
+% Adjust the position for better readability, e.g., slightly above/right
+text(pos_mars(1)+0.02, pos_mars(2)+0.02,label_text, ...
+    'VerticalAlignment', 'bottom', ... % Align text below the point
+    'HorizontalAlignment', 'left', ...  % Align text to the left of the point
+    'Color', 'k', ... % 'k' for black text
+    'FontSize', 14); 
 
 
-%
-fun =  @(lambda)obj_fun(lambda,const)
+% Plot the first and last points with a different marker (e.g., a red asterisk)
+plot( 0 , 0 ,              'k+',...
+array_r_mars(:,1),   array_r_mars(:,2),   'k-.',...
+array_r_earth(:,1) , array_r_earth(:,2),  'k-.'...
+);
 
-[x,fval]       = fmincon(fun,x0,A,b,Aeq,beq,lb,ub,nonlcon,options)
+
+% Highlight thrust segment  with a different style
+plot(y(:,1) , y(:,2),       'k--', 'LineWidth', 2) ;
+plot(y(pts_switch:end, 1), y(pts_switch:end , 2),'k', 'LineWidth', 4) 
+
+legend('Erath', 'Mars','Sun','Spacecraft');
 
 
+axis square; 
+
+% % 4. Add the vector (arrow)
+% quiver(y(pts_switch:end, 1), y(pts_switch:end , 2), t_swicth_alpha(pts_switch:end,3)*0.5, t_swicth_alpha(pts_switch:end,4)*0.5, 'k', 'LineWidth', 2)
+
+savefig(h_trajector, 'low_fidelity_earth_mars_trajectory.fig');
+hold off;
+
+
+
+% Requires export_fig toolbox from File Exchange
+exportgraphics(h_trajector, 'low_fidelity_earth_mars_trajectory.pdf', 'ContentType', 'vector');
+exportgraphics(h_thrust, 'low_fidelity_earth_mars_thrust.pdf', 'ContentType', 'vector');
 
 
 return
 end
 
-function [c,ceq] = mycon(x)
 
-%  costate
-lambda = x(1:7);
-norm_lambda = norm(lambda);
-
-% constraints
-c   = [];...                 % Compute nonlinear inequalities at x.
-ceq = norm_lambda - 1.0; ...   % Compute nonlinear equalities at x.
-
-return
-end
-
+%%
 
 function x0 = Initial_state_costate_state(const,vin_alpha_delta)
 
-
-
+%-----
+v0_inf  = 0.20 + vin_alpha_delta(1);
 %-----
 
-delta_v0  = 0.20;          % AU unit, not regular km/s
 alpha0 = deg2rad(140);
-%
 delta0 = deg2rad(3) ;
 
 %-----
 
-v0_inf = delta_v0 + vin_alpha_delta(1);                                
+                           
 alpha0 = alpha0   + vin_alpha_delta(2);
 delta0 = delta0   + vin_alpha_delta(3);
 
@@ -205,25 +225,9 @@ return
 end
 
 
+
+function [feq,t,y,const] = transport_pde_low_thrust(xzero,const)
 %
-
-
-function  J = obj_fun(lambda,const)
-
-% final condition using initial value of costate
-[Mu]  = transport_pde_low_thrust(lambda,const);
-
-
-% obj
-J  = norm(Mu);
-
-
-return
-end
-
-
-function feq = transport_pde_low_thrust(xzero,const)
-% 
 vin_alpha_delta = xzero(8:10);
 
 % initial state and costate
@@ -306,24 +310,10 @@ return
 end
 
 
-%----
-function [value,isterminal,direction] = RfEvents(t,y,const)
-
-
-rf_mars = const.rf_mars;
-
-value = y(2) - rf_mars(2);     % Detect height = 0
-isterminal = 1;   % Stop the integration
-direction =  1;     % The zero can be approached from either direction
-
-
-return
-end
-%----
 
 
 function dot_x = initial_ode_transport_dyn(t,y0,const)
-
+global u_flag
 
 % const value 
 mu   = const.mu;
@@ -350,11 +340,15 @@ norm_r = norm(r);
 g_r    = -mu/norm_r^3*r;
 % -------------------------
 
+% g_r = high_fideity_heliocentric_acc(t,x,const);
 
+% -------------------------
 % % eq.2.61, the switching function
 [u,alpha]     = Hamiltonian_switch(x,lambda_0,const);
 
-u = 1;
+if(u_flag == 1)
+    u=1;
+end
 
 % dot_x, eq. (3.48)
 
@@ -435,11 +429,22 @@ const.xf = [const.rf_mars;const.vf_mars; mf_target/const.m_ref];
 
 %
 const. lambda_mf =0.0;
+
+
+
+% initial conditon
+[r0_earth,v0_earth,E0_earth] = pleph_an (const.mjd2000, 3);
+const.r0_earth = r0_earth'/const.l_ref;
+const.v0_earth = v0_earth'/const.l_ref;
+
+
+
+
 return
 end
 
 
-function dot_y = ode_transport_dyn(t,y,const)
+function [dot_y,u,alpha] = ode_transport_dyn(t,y,const)
 
 % const value 
 mu   = const.mu;
@@ -461,11 +466,11 @@ lambda = y(8:14);
 
 %---
 % %eq. 2.5
-% norm_r = norm(r);
-% g_r    = -mu/norm_r^3*r;
+norm_r = norm(r);
+g_r    = -mu/norm_r^3*r;
 
 %---
-g_r = high_fideity_heliocentric_acc(t,x,const);
+% g_r = high_fideity_heliocentric_acc(t,x,const);
 %---
 
 % % eq.2.61, the switching function
@@ -564,10 +569,7 @@ dot_x0 = const.dot_x0;
 A = eye(7,7)*epsl; 
 
 
-% 
-% %----
-
-% % ---
+% ---
 if(t < epsl_t)
     K      = 0.0 ;
 else
