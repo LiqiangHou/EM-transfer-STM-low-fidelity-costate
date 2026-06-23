@@ -57,9 +57,6 @@ format short g;
 % initial trial of lambda 
 
 
-global epsl
-global epsl_t
-
 % the optimal
 
 addpath('asteroid propagation');
@@ -70,14 +67,6 @@ TOF_days =  474.43;
 
 % const values
 const          = initial_const_transport(TOF_days);
-
-
-%-----
-epsl = 5.0e-4;
-epsl_t = 1.0e-5;
-%-----
-
-
 
 
 %
@@ -548,21 +537,18 @@ end
 
 
 function dot_lambda = dot_costate_sensitive(t,x,dot_x,lambda,const)
-global epsl
-global epsl_t
+%-----
+epsl = 5.0e-4;
+epsl_t = 1.0e-5;
+%-----
 
 x0     = const.x0;
 dot_x0 = const.dot_x0;
 
 
-
-
 % The gain matrix
 A = eye(7,7)*epsl; 
 
-
-% 
-% %----
 
 % % ---
 if(t < epsl_t)
