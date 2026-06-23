@@ -6,44 +6,24 @@ close all;
 format short g;
 
 
-% initial trial of lambda 
 
 
-global epsl
-global epsl_t
-global u_flag
-% the optimal
 
 addpath('asteroid propagation');
 addpath('convolution-branch-nov-27');
-addpath('high fidelity heliocentric');
 
 
+%-- optimal initla guess of costate and departure parameters ---
+xzero =    [       -0.14019     -0.75479     -0.01694     -0.48182      0.47409      0.17477    0.0058159     0.037689     0.048614    0.0055288];
 
-
-
-
+%
 TOF_days =  474.43;
 
 % const values
 const          = initial_const_transport(TOF_days);
 
-
-%-----
-epsl = 5.0e-4;
-epsl_t = 1.0e-5;
-%-----
-
-
-
-u_flag = 1;
-T = 0.33;
-xzero =    [       -0.14019     -0.75479     -0.01694     -0.48182      0.47409      0.17477    0.0058159     0.037689     0.048614    0.0055288];
-%------------------------
-
 % construct the transfer
 [feq,t,y,const] = transport_pde_low_thrust(xzero,const);
-
 
 
 % 
@@ -316,7 +296,6 @@ end
 
 
 function dot_x = initial_ode_transport_dyn(t,y0,const)
-global u_flag
 
 % const value 
 mu   = const.mu;
@@ -341,17 +320,14 @@ lambda_0 = y0(8:14);
 % -------------------------
 norm_r = norm(r);
 g_r    = -mu/norm_r^3*r;
-% -------------------------
-
-% g_r = high_fideity_heliocentric_acc(t,x,const);
 
 % -------------------------
 % % eq.2.61, the switching function
 [u,alpha]     = Hamiltonian_switch(x,lambda_0,const);
 
-if(u_flag == 1)
-    u=1;
-end
+
+% the value of u is set to 1 for initialize dot_x at departure 
+u=1;
 
 % dot_x, eq. (3.48)
 
@@ -473,8 +449,7 @@ norm_r = norm(r);
 g_r    = -mu/norm_r^3*r;
 
 %---
-% g_r = high_fideity_heliocentric_acc(t,x,const);
-%---
+
 
 % % eq.2.61, the switching function
 [u,alpha]     = Hamiltonian_switch(x,lambda,const);
@@ -559,8 +534,11 @@ end
 
 
 function dot_lambda = dot_costate_sensitive(t,x,dot_x,lambda,const)
-global epsl
-global epsl_t
+%-----
+epsl = 5.0e-4;
+epsl_t = 1.0e-5;
+%-----
+
 
 x0     = const.x0;
 dot_x0 = const.dot_x0;

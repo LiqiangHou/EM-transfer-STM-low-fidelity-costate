@@ -109,7 +109,7 @@ ub = [ 1.0*ones(1,7) ];
 
 % initial trial of lambda 
 
-lambda_0 = 0.1 *ones(1,7);
+lambda_0 = 0.2 *ones(1,7);
 nonlcon = [];
 
 x0      = [lambda_0];
@@ -461,12 +461,9 @@ lambda = y(8:14);
 
 %---
 % %eq. 2.5
-% norm_r = norm(r);
-% g_r    = -mu/norm_r^3*r;
-
-%---
-g_r = high_fideity_heliocentric_acc(t,x,const);
-%---
+norm_r = norm(r);
+g_r    = -mu/norm_r^3*r;
+%------
 
 % % eq.2.61, the switching function
 [u,alpha]     = Hamiltonian_switch(x,lambda,const);
