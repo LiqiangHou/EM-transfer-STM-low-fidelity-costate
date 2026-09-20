@@ -114,6 +114,8 @@
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 1rem;
       margin-top: 1.25rem;
+      padding: 0;
+      list-style: none;
     }
 
     .metric {
@@ -181,20 +183,20 @@
         ODE113, and the repository README reports a terminal rendezvous error norm below
         <strong>1.0e-5</strong> for the documented implementation example.
       </p>
-      <dl class="metrics">
-        <div class="metric">
-          <dt class="metric-label">Primary Method</dt>
-          <dd class="metric-value">STM-Based Costate Analysis</dd>
-        </div>
-        <div class="metric">
-          <dt class="metric-label">Integrator</dt>
-          <dd class="metric-value">ODE113</dd>
-        </div>
-        <div class="metric">
-          <dt class="metric-label">Reported Rendezvous Error Norm</dt>
-          <dd class="metric-value">&lt; 1.0e-5 in the documented example case</dd>
-        </div>
-      </dl>
+      <ul class="metrics" aria-label="Project metrics">
+        <li class="metric">
+          <span class="metric-label">Primary Method</span>
+          <span class="metric-value">STM-Based Costate Analysis</span>
+        </li>
+        <li class="metric">
+          <span class="metric-label">Integrator</span>
+          <span class="metric-value">ODE113</span>
+        </li>
+        <li class="metric">
+          <span class="metric-label">Reported Rendezvous Error Norm</span>
+          <span class="metric-value">&lt; 1.0e-5 in the documented example case</span>
+        </li>
+      </ul>
     </section>
 
     <section aria-labelledby="motivation-title">
