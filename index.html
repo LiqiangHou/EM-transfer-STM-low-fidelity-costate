@@ -131,6 +131,7 @@
     }
 
     .metric-value {
+      margin: 0;
       font-size: 1.2rem;
       font-weight: 700;
       color: var(--accent);
@@ -177,23 +178,23 @@
       <p>
         The framework combines low-fidelity transfer dynamics, STM propagation, and costate-based
         correction to iteratively improve terminal conditions. Numerical integration is performed with
-        ODE113, and the current implementation achieves a terminal rendezvous error norm below
-        <strong>1.0e-5</strong>.
+        ODE113, and the repository README reports a terminal rendezvous error norm below
+        <strong>1.0e-5</strong> for the documented implementation example.
       </p>
-      <div class="metrics">
+      <dl class="metrics">
         <div class="metric">
-          <span class="metric-label">Primary Method</span>
-          <span class="metric-value">STM-Based Costate Analysis</span>
+          <dt class="metric-label">Primary Method</dt>
+          <dd class="metric-value">STM-Based Costate Analysis</dd>
         </div>
         <div class="metric">
-          <span class="metric-label">Integrator</span>
-          <span class="metric-value">ODE113</span>
+          <dt class="metric-label">Integrator</dt>
+          <dd class="metric-value">ODE113</dd>
         </div>
         <div class="metric">
-          <span class="metric-label">Terminal Error Norm</span>
-          <span class="metric-value">&lt; 1.0e-5</span>
+          <dt class="metric-label">Reported Rendezvous Error Norm</dt>
+          <dd class="metric-value">&lt; 1.0e-5 in the documented example case</dd>
         </div>
-      </div>
+      </dl>
     </section>
 
     <section aria-labelledby="motivation-title">
@@ -243,9 +244,10 @@
       <h2 id="performance-title">Numerical Performance</h2>
       <p>
         Preliminary results indicate that the proposed method provides robust convergence and accurate
-        rendezvous solutions in the tested scenarios. The present implementation attains a terminal
-        rendezvous error norm below <strong>1.0e-5</strong>, demonstrating the suitability of the
-        framework for early-stage mission design and research-oriented trajectory studies.
+        rendezvous solutions in the documented example workflow described in the repository README. In
+        that reported example, the implementation attains a terminal rendezvous error norm below
+        <strong>1.0e-5</strong>. This homepage presents the result as a repository-reported reference
+        value rather than a universal performance bound across all transfer scenarios.
       </p>
     </section>
 
