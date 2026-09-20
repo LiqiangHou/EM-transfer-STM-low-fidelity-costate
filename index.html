@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EM Transfer with STM-Based Low-Fidelity Costate Method</title>
+  <meta
+    name="description"
+    content="A formal research-lab homepage for a low-fidelity Earth–Moon transfer framework using STM propagation, costate-based correction, and ODE113 integration."
+  >
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f5f7fb;
+      --panel: #ffffff;
+      --text: #1e293b;
+      --muted: #475569;
+      --accent: #0f4c81;
+      --border: #d9e2ec;
+      --shadow: 0 12px 32px rgba(15, 23, 42, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Times New Roman", Georgia, serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    header {
+      background: linear-gradient(135deg, #e8eef6 0%, #f9fbfd 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 4rem 1.5rem 3rem;
+    }
+
+    .hero,
+    main,
+    footer {
+      width: min(960px, calc(100% - 3rem));
+      margin: 0 auto;
+    }
+
+    .eyebrow {
+      margin: 0 0 0.75rem;
+      color: var(--accent);
+      font-size: 0.95rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2 {
+      line-height: 1.25;
+      font-weight: 600;
+      color: #0f172a;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2.2rem, 4vw, 3.5rem);
+      max-width: 14ch;
+    }
+
+    .subtitle {
+      max-width: 760px;
+      margin: 1.25rem 0 0;
+      font-size: 1.15rem;
+      color: var(--muted);
+    }
+
+    main {
+      padding: 2.5rem 0 3rem;
+    }
+
+    section {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    h2 {
+      margin-top: 0;
+      font-size: 1.6rem;
+    }
+
+    p {
+      margin: 0 0 1rem;
+    }
+
+    p:last-child,
+    ul:last-child {
+      margin-bottom: 0;
+    }
+
+    ul {
+      margin: 1rem 0;
+      padding-left: 1.4rem;
+    }
+
+    li + li {
+      margin-top: 0.45rem;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+      margin-top: 1.25rem;
+    }
+
+    .metric {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem 1.1rem;
+      background: #fbfdff;
+    }
+
+    .metric-label {
+      display: block;
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin-bottom: 0.35rem;
+    }
+
+    .metric-value {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    footer {
+      padding: 0 0 3rem;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 640px) {
+      header {
+        padding-top: 3rem;
+      }
+
+      section {
+        padding: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="hero">
+      <p class="eyebrow">Research Project Homepage</p>
+      <h1>Earth–Moon Transfer Analysis Using an STM-Based Low-Fidelity Costate Method</h1>
+      <p class="subtitle">
+        A formal research-lab presentation of a numerical framework for preliminary trajectory design,
+        sensitivity analysis, and rendezvous targeting in low-fidelity Earth–Moon transfer problems.
+      </p>
+    </div>
+  </header>
+
+  <main>
+    <section aria-labelledby="overview-title">
+      <h2 id="overview-title">Overview</h2>
+      <p>
+        This project presents a numerical framework for Earth–Moon transfer analysis based on a State
+        Transition Matrix (STM)-driven low-fidelity costate method. The implementation is designed to
+        support preliminary mission design, trajectory sensitivity analysis, and rendezvous targeting
+        with low computational cost and strong numerical accuracy.
+      </p>
+      <p>
+        The framework combines low-fidelity transfer dynamics, STM propagation, and costate-based
+        correction to iteratively improve terminal conditions. Numerical integration is performed with
+        ODE113, and the current implementation achieves a terminal rendezvous error norm below
+        <strong>1.0e-5</strong>.
+      </p>
+      <div class="metrics">
+        <div class="metric">
+          <span class="metric-label">Primary Method</span>
+          <span class="metric-value">STM-Based Costate Analysis</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Integrator</span>
+          <span class="metric-value">ODE113</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Terminal Error Norm</span>
+          <span class="metric-value">&lt; 1.0e-5</span>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="motivation-title">
+      <h2 id="motivation-title">Research Motivation</h2>
+      <p>
+        Trajectory design for Earth–Moon missions often requires repeated analysis across a wide design
+        space. Although high-fidelity models are essential in later mission phases, they can be
+        computationally demanding during early concept development. Low-fidelity methods therefore
+        remain important for rapid iteration, sensitivity studies, and generation of initial guesses
+        for more advanced optimization pipelines.
+      </p>
+      <p>
+        This project addresses that need by developing a lightweight yet accurate framework for transfer
+        analysis and rendezvous correction.
+      </p>
+    </section>
+
+    <section aria-labelledby="objectives-title">
+      <h2 id="objectives-title">Research Objectives</h2>
+      <ul>
+        <li>Develop a computationally efficient low-fidelity Earth–Moon transfer model.</li>
+        <li>Propagate state sensitivities through the State Transition Matrix.</li>
+        <li>Apply costate-based correction to reduce terminal mismatch.</li>
+        <li>Support preliminary rendezvous design with high numerical accuracy.</li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="methodology-title">
+      <h2 id="methodology-title">Methodology</h2>
+      <p>
+        The implemented framework follows a sensitivity-based correction strategy for transfer design.
+        The state and associated variational dynamics are propagated numerically, enabling construction
+        of the STM. This matrix characterizes the sensitivity of the terminal state to perturbations in
+        the initial condition. Based on this information, a costate-based update is used to iteratively
+        refine the trajectory and reduce rendezvous error.
+      </p>
+      <ul>
+        <li>Low-fidelity trajectory propagation</li>
+        <li>STM computation and propagation</li>
+        <li>Costate-based terminal correction</li>
+        <li>ODE113 integration</li>
+        <li>Terminal error norm evaluation</li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="performance-title">
+      <h2 id="performance-title">Numerical Performance</h2>
+      <p>
+        Preliminary results indicate that the proposed method provides robust convergence and accurate
+        rendezvous solutions in the tested scenarios. The present implementation attains a terminal
+        rendezvous error norm below <strong>1.0e-5</strong>, demonstrating the suitability of the
+        framework for early-stage mission design and research-oriented trajectory studies.
+      </p>
+    </section>
+
+    <section aria-labelledby="significance-title">
+      <h2 id="significance-title">Research Significance</h2>
+      <p>This framework is intended to support:</p>
+      <ul>
+        <li>Rapid transfer trajectory prototyping</li>
+        <li>Sensitivity and convergence studies</li>
+        <li>Generation of initial guesses for higher-fidelity solvers</li>
+        <li>Educational and research applications in orbital dynamics and mission design</li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="future-title">
+      <h2 id="future-title">Future Directions</h2>
+      <ul>
+        <li>Incorporation of higher-fidelity dynamical models</li>
+        <li>Visualization of transfer trajectories and correction histories</li>
+        <li>Benchmarking against alternative targeting methods</li>
+        <li>Integration with broader optimization and mission design workflows</li>
+      </ul>
+    </section>
+  </main>
+
+  <footer>
+    <p>
+      Repository: <strong>EM-transfer-STM-low-fidelity-costate</strong>
+    </p>
+  </footer>
+</body>
+</html>
